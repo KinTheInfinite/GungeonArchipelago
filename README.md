@@ -1,2 +1,2 @@
-# GungeonArchipelago
-An Enter The Gungeon randomizer for https://archipelago.gg
+# Gungeon Archipelago
+ An Enter The Gungeon randomizer for https://archipelago.gg
