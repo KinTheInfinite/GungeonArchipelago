@@ -12,6 +12,9 @@ using UnityEngine.UI;
 using Alexandria.ItemAPI;
 using static DirectionalAnimation;
 using System.Net.Sockets;
+using System.Reflection;
+using System.Diagnostics;
+using BepInEx.Bootstrap;
 
 namespace GungeonArchipelago
 {
@@ -42,10 +45,12 @@ namespace GungeonArchipelago
             ETGModConsole.CommandDescriptions.Add("archipelago connect", "Input the ip, port, player name, and password seperated by spaces");
             ETGModConsole.CommandDescriptions.Add("archipelago items", "Use when you are starting a new run but are already connected to spawn your items in");
             ETGModConsole.CommandDescriptions.Add("archipelago chat", "Sends a chat message to your connected server");
+            ETGModConsole.CommandDescriptions.Add("archipelago assemblies", "Prints all loaded assemblies for debugging purposes");
             ETGModConsole.Commands.AddGroup("archipelago");
             ETGModConsole.Commands.GetGroup("archipelago").AddGroup("connect", (string[] args) => ArchipelagoConnect(args));
             ETGModConsole.Commands.GetGroup("archipelago").AddGroup("items", (string[] args) => ArchipelagoItems());
             ETGModConsole.Commands.GetGroup("archipelago").AddGroup("chat", (string[] args) => ArchipelagoChat(args[0]));
+            ETGModConsole.Commands.GetGroup("archipelago").AddGroup("assemblies", (string[] args) => PrintAssemblies());
             ETGMod.Chest.OnPostOpen += OnChestOpen;
             // For sprite purposes on items received and sent (should probably be its own class)
             string item_name = "Archipelago Item";
@@ -299,7 +304,7 @@ namespace GungeonArchipelago
 
         public static void Log(string text, string color = "#FFFFFF")
         {
-            ETGModConsole.Log($"<color={color}>{text}</color>");
+            ETGModConsole.Log(text);
         }
 
         public static void OnChestOpen(Chest chest, PlayerController controller)
@@ -414,6 +419,15 @@ namespace GungeonArchipelago
         public static void ArchipelagoChat(string message)
         {
             session.Socket.SendPacketAsync(new SayPacket() { Text = message });
+        }
+
+        public static void PrintAssemblies()
+        {
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly assembly in assemblies)
+            {
+                Log("Assembly " + assembly.FullName + "Location " + assembly.Location);
+            }
         }
 
         public static void OnMessageReceived(LogMessage message)
